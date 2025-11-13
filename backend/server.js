@@ -10,15 +10,14 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
-// ✅ MongoDB connection
-mongoose.connect(
-  MONGO_URI,
-  { useNewUrlParser: true, useUnifiedTopology: true }
-).then(() => {
-  console.log("✅ MongoDB Connected");
-}).catch(err => {
-  console.error("❌ MongoDB connection error:", err.message);
-});
+// ✅ MongoDB connection using env variable
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err.message))
 
 // API Test
 app.get('/', (req, res) => {
