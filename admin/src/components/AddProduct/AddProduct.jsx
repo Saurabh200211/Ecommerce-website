@@ -11,6 +11,9 @@ const AddProduct = () => {
     old_price: ""
   });
 
+  // ✅ Get API base URL from environment variable
+  const API_URL = process.env.REACT_APP_API_URL;
+
   // Handle image change
   const imageHandler = (e) => {
     setImage(e.target.files[0]);
@@ -28,50 +31,55 @@ const AddProduct = () => {
       return;
     }
 
-    // Step 1: Upload image
-    const formData = new FormData();
-    formData.append("image", image); // ✅ must match backend (upload.single('image'))
+    try {
+      // Step 1: Upload image
+      const formData = new FormData();
+      formData.append("image", image);
 
-    const uploadRes = await fetch("http://localhost:4000/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    const uploadData = await uploadRes.json();
-    if (!uploadData.success) {
-      alert("Image upload failed");
-      return;
-    }
-
-    // Step 2: Save product with returned image_url
-    const productRes = await fetch("http://localhost:4000/addproduct", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: productDetails.name,
-        old_price: productDetails.old_price,
-        new_price: productDetails.new_price,
-        category: productDetails.category,
-        image: uploadData.image_url, // ✅ use backend response
-      }),
-    });
-
-    const productData = await productRes.json();
-    console.log(productData);
-
-    if (productData.success) {
-      alert("✅ Product added successfully!");
-      setProductDetails({
-        name: "",
-        category: "women",
-        new_price: "",
-        old_price: ""
+      const uploadRes = await fetch(`${API_URL}upload`, {
+        method: "POST",
+        body: formData,
       });
-      setImage(false);
-    } else {
-      alert("❌ Failed to add product");
+
+      const uploadData = await uploadRes.json();
+      if (!uploadData.success) {
+        alert("Image upload failed");
+        return;
+      }
+
+      // Step 2: Save product with returned image_url
+      const productRes = await fetch(`${API_URL}addproduct`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: productDetails.name,
+          old_price: productDetails.old_price,
+          new_price: productDetails.new_price,
+          category: productDetails.category,
+          image: uploadData.image_url,
+        }),
+      });
+
+      const productData = await productRes.json();
+
+      if (productData.success) {
+        alert("✅ Product added successfully!");
+        setProductDetails({
+          name: "",
+          category: "women",
+          new_price: "",
+          old_price: ""
+        });
+        setImage(false);
+      } else {
+        alert("❌ Failed to add product");
+      }
+
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("Something went wrong while adding the product");
     }
   };
 

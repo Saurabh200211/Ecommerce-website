@@ -4,17 +4,14 @@ import './Popular.css'
 import Item from '../Item/Item'
 import { useEffect } from 'react';
 
-
-
-
-
 const Popular = () => {
   
 
   const [popularProducts,setPopularProducts] = useState([]);
+   const API_URL = process.env.REACT_APP_API_URL;
 
 useEffect(()=>{
-  fetch('http://localhost:4000/populariwomen')
+  fetch(`${API_URL}`)
   .then((response)=>response.json())
   .then((data)=>setPopularProducts(data));
 },[])

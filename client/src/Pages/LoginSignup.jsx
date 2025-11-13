@@ -4,52 +4,63 @@ import './CSS/LoginSinup.css';
 const LoginSignup = () => {
   const [state, setState] = useState("Login");
   const [formData, setFormData] = useState({
-    name: "",    // ✅ changed from username → name (to match backend)
+    name: "",
     password: "",
     email: ""
   });
+
+  // ✅ Load base API URL from environment
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Login
+  // ✅ Login Function
   const login = async () => {
-    console.log("Login Function Executed", formData);
-    let responseData;
-    await fetch('http://localhost:4000/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then((data) => (responseData = data));
+    try {
+      console.log("Login Function Executed", formData);
+      const response = await fetch(`${API_URL}api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    if (responseData.success) {
-      localStorage.setItem('auth-token', responseData.token);
-      window.location.replace("/");
-    } else {
-      alert(responseData.errors);
+      const responseData = await response.json();
+
+      if (responseData.success) {
+        localStorage.setItem('auth-token', responseData.token);
+        window.location.replace("/");
+      } else {
+        alert(responseData.errors || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Something went wrong while logging in.");
     }
   };
 
-  // ✅ Signup
+  // ✅ Signup Function
   const signup = async () => {
-    console.log("Signup Function Executed", formData);
-    let responseData;
-    await fetch('http://localhost:4000/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then((data) => (responseData = data));
+    try {
+      console.log("Signup Function Executed", formData);
+      const response = await fetch(`${API_URL}api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    if (responseData.success) {
-      localStorage.setItem('auth-token', responseData.token);
-      window.location.replace("/");
-    } else {
-      alert(responseData.errors);
+      const responseData = await response.json();
+
+      if (responseData.success) {
+        localStorage.setItem('auth-token', responseData.token);
+        window.location.replace("/");
+      } else {
+        alert(responseData.errors || "Signup failed");
+      }
+    } catch (error) {
+      console.error("Signup Error:", error);
+      alert("Something went wrong while signing up.");
     }
   };
 
@@ -82,18 +93,23 @@ const LoginSignup = () => {
             placeholder='Password'
           />
         </div>
-        <button onClick={() => { state === "Login" ? login() : signup() }}>Continue</button>
+
+        <button onClick={() => (state === "Login" ? login() : signup())}>
+          Continue
+        </button>
+
         {state === "Sign Up" ? (
           <p className='loginsignup-login'>
             Already have an account?{" "}
-            <span onClick={() => { setState("Login") }}>Login here</span>
+            <span onClick={() => setState("Login")}>Login here</span>
           </p>
         ) : (
           <p className='loginsignup-login'>
             Create an account?{" "}
-            <span onClick={() => { setState("Sign Up") }}>Click here</span>
+            <span onClick={() => setState("Sign Up")}>Click here</span>
           </p>
         )}
+
         <div className='loginsignup-agree'>
           <input type="checkbox" />
           <p>By continuing, I agree to the terms of use & privacy policy.</p>

@@ -4,10 +4,12 @@ import './NewCollections.css'
 import Item from '../Item/Item'
 
 const NewCollections = () => {
-
+  
+    const API_URL = process.env.REACT_APP_API_URL;
+   
   const [new_Collections,setNew_collections] = useState([]);
   useEffect(()=>{
-    fetch('http://localhost:4000/newcollections')
+    fetch(`${API_URL}`)
     .then((response)=>response.json())
     .then((data)=>setNew_collections(data));
   },[])
