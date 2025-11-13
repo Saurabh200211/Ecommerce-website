@@ -12,7 +12,7 @@ app.use(express.json());
 
 // ✅ MongoDB connection
 mongoose.connect(
-  "mongodb+srv://satputesaurabh169_db_user:satsaurabh1234@cluster0.2j1l1ok.mongodb.net/e-commerce?retryWrites=true&w=majority",
+  MONGO_URI,
   { useNewUrlParser: true, useUnifiedTopology: true }
 ).then(() => {
   console.log("✅ MongoDB Connected");
